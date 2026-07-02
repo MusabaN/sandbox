@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  BINARY_NAME: sandbox
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify tag matches package.json version
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          pkg_version="$(jq -r .version package.json)"
+          if [ "$tag_version" != "$pkg_version" ]; then
+            echo "::error::Tag v$tag_version does not match package.json version $pkg_version"
+            exit 1
+          fi
+
+  build:
+    needs: check-version
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - bun_target: bun-darwin-arm64
+            asset_suffix: darwin-arm64
+          - bun_target: bun-darwin-x64
+            asset_suffix: darwin-x64
+          - bun_target: bun-linux-x64
+            asset_suffix: linux-x64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - name: Compile ${{ matrix.bun_target }}
+        run: bun build ./src/cli.ts --compile --target=${{ matrix.bun_target }} --outfile dist/${{ env.BINARY_NAME }}
+      - name: Package tarball
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          asset="${{ env.BINARY_NAME }}-${version}-${{ matrix.asset_suffix }}.tar.gz"
+          tar -czf "$asset" -C dist "${{ env.BINARY_NAME }}"
+          echo "ASSET=$asset" >> "$GITHUB_ENV"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_suffix }}
+          path: ${{ env.ASSET }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Flatten artifacts and checksum
+        run: |
+          mkdir -p release
+          find artifacts -name '*.tar.gz' -exec cp {} release/ \;
+          cd release && shasum -a 256 *.tar.gz | tee checksums.txt
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true
