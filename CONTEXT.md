@@ -1,6 +1,6 @@
 # Sandbox
 
-A per-developer Docker container that hosts all the Git repositories a person might need — their team's repos in the `mollerdigital` GitHub organization — and lets them run scoped opencode sessions against subsets of those repos.
+A per-developer Docker container that hosts all the Git repositories a person might need — their team's repos in the `acme-digital` GitHub organization — and lets them run scoped opencode sessions against subsets of those repos.
 
 ## Language
 
@@ -13,7 +13,7 @@ The host-side command-line tool (`sandbox`) that bootstraps a Sandbox — detect
 _Avoid_: installer, wizard
 
 **Team Repos**:
-The set of repositories a user's team(s) have access to in the `mollerdigital` GitHub organization, as returned by `gh api orgs/mollerdigital/teams/{slug}/repos`, excluding archived repos. In the MVP this is the *only* source of repos in the Sandbox.
+The set of repositories a user's team(s) have access to in the `acme-digital` GitHub organization, as returned by `gh api orgs/acme-digital/teams/{slug}/repos`, excluding archived repos. In the MVP this is the *only* source of repos in the Sandbox.
 
 **Shared Repos** _(post-MVP)_:
 Repositories that every Sandbox will eventually include regardless of team — the common cloud infrastructure repos. Not part of the MVP. The set will likely come from an org-wide cloud repo that catalogues cross-team infrastructure.

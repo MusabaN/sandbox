@@ -4,7 +4,7 @@ Status: ready-for-agent
 
 ## Problem Statement
 
-A developer at Måler Digital works across several repositories that belong to their team, plus (eventually) cross-team infrastructure repos. When they want to hand a task to an AI coding agent like opencode, three problems get in the way:
+A developer at Acme Digital works across several repositories that belong to their team, plus (eventually) cross-team infrastructure repos. When they want to hand a task to an AI coding agent like opencode, three problems get in the way:
 
 1. **Repo discovery is manual.** New joiners don't know which repos their team owns. Existing team members have local clones scattered across their machine at different levels of freshness.
 2. **The agent sees too much.** Pointing opencode at a directory full of 20+ cloned repos gives it 20+ places to grep, most of them irrelevant to the current task. Answers get slower and worse.
@@ -16,7 +16,7 @@ There is no shared, reproducible way for a developer to say "give me my team's s
 
 A per-developer **Sandbox** — a Docker container that hosts all the Git repositories the developer's team owns — plus a host-side **Setup CLI** (`sandbox`) that provisions it and manages sessions inside it.
 
-The developer runs `sandbox init` once. The CLI detects their GitHub team memberships in the `mollerdigital` organization (via `gh`), lets them pick the team(s) they belong to, and clones every non-archived repo those teams have access to into the container.
+The developer runs `sandbox init` once. The CLI detects their GitHub team memberships in the `acme-digital` organization (via `gh`), lets them pick the team(s) they belong to, and clones every non-archived repo those teams have access to into the container.
 
 To do work, the developer runs `sandbox chat "…"`, which enters the container and presents an interactive **Repo Picker** — repos grouped by **Application** (repos sharing a `-`-separated prefix, e.g. `checkout-api` / `checkout-web` / `checkout-infra` all belong to the `checkout` Application). The developer picks the exact repos they want in scope. The launcher creates a per-**Session** directory of `git worktree`s pinned to fresh `origin/main` for each scoped repo, and drops the developer into opencode with that directory as the working root.
 
@@ -30,9 +30,9 @@ When the developer's team membership changes or they want to trim what's cloned,
 
 1. As a developer, I want to install the Setup CLI via Homebrew, so that I don't need Node, Bun, or any other runtime installed on my host.
 2. As a developer, I want `sandbox init` to check that `gh` is installed and authenticated before doing anything else, so that I don't hit an obscure failure halfway through setup.
-3. As a developer, I want `sandbox init` to auto-detect my team memberships in the `mollerdigital` GitHub organization, so that I don't have to type or remember team slugs.
+3. As a developer, I want `sandbox init` to auto-detect my team memberships in the `acme-digital` GitHub organization, so that I don't have to type or remember team slugs.
 4. As a developer, I want to see a checklist of every team I'm a member of with all teams pre-checked, so that in the common single-team case I can just press Enter, and in the multi-team case I can uncheck teams whose repos I don't want.
-5. As a developer whose GitHub account is in zero Måler Digital teams, I want a clear error message telling me what to do, so that I'm not stuck at a blank picker.
+5. As a developer whose GitHub account is in zero Acme Digital teams, I want a clear error message telling me what to do, so that I'm not stuck at a blank picker.
 6. As a developer, I want the CLI to fetch all repos accessible to my selected team(s) and filter out archived repos, so that dead code doesn't take up disk or attention.
 7. As a developer, I want to see a **Repo Set Editor** during `init` that groups the discovered repos by **Application** (shared `-` prefix), with every Application pre-checked, so that in the default case I just confirm and get everything.
 8. As a developer, I want the Repo Set Editor to only offer Application-level selection (not per-repo), so that a whole product's repos are always cloned together and stay consistent.
@@ -74,8 +74,8 @@ When the developer's team membership changes or they want to trim what's cloned,
 
 ### GitHub interaction
 
-- Team membership discovery uses `gh api /user/teams`, filtered to teams in the `mollerdigital` organization.
-- Team repo discovery uses `gh api orgs/mollerdigital/teams/{slug}/repos --paginate`. No filtering by permission level.
+- Team membership discovery uses `gh api /user/teams`, filtered to teams in the `acme-digital` organization.
+- Team repo discovery uses `gh api orgs/acme-digital/teams/{slug}/repos --paginate`. No filtering by permission level.
 - Archived repos are excluded (the `archived` field on the repo API response).
 - Multiple selected teams: their repo sets are unioned; duplicates collapse.
 
@@ -139,7 +139,7 @@ The container ships with a **session launcher** binary that is *separate* from t
 
 - **Host Setup CLI** — one test seam covering `init`, `refresh`, `chat`. Fakes `gh` and `docker`. Assertions:
   - Given fake `gh` output, the correct `docker` commands are invoked.
-  - Team detection filters to the `mollerdigital` org.
+  - Team detection filters to the `acme-digital` org.
   - Archived repos are excluded.
   - Repo Set Editor is presented with Applications grouped correctly and the correct pre-selection state.
   - `chat` forwards to the container launcher with the expected arguments.

@@ -34,8 +34,8 @@ Decisions made while implementing (issue text left these open):
 - **Tap location**: `Formula/` in this repo (not a sibling `homebrew-*` repo).
   Tapped via the explicit-URL form: `brew tap <owner>/sandbox https://github.com/<owner>/sandbox`.
 - **Repo/visibility**: pushed to a public repo (`MusabaN/sandbox`) rather than
-  `mollerdigital/sandbox`, to avoid putting a scaffold-stage repo in the real
-  784-repo company org. **Follow-up for a human**: transfer to `mollerdigital`
+  `acme-digital/sandbox`, to avoid putting a scaffold-stage repo in the real
+  company org. **Follow-up for a human**: transfer to the org
   (or re-point the formula's `homepage`/`url`s) before this is used for real.
 - **Version source**: `package.json` `version` field, embedded at compile time
   via a static JSON import (`import { version } from "../package.json" with { type: "json" }`);
