@@ -60,3 +60,29 @@ Verified end-to-end for real, not just locally:
   binaries for their target (`file` shows Mach-O arm64, Mach-O x86_64, ELF
   x86-64 respectively); ran the darwin-x64 one for real under Rosetta.
 - `brew style Formula/sandbox.rb` passes with no offenses.
+
+## Follow-up: real org/company name scrubbed (2026-07-02)
+
+This repo lives on a personal public GitHub account, not the real org — the
+user asked to keep specifics about the real organization out of it. Audit
+findings (grepped both the working tree and full `git log --all -p` diff
+history for the real org slug and known real repo-name fragments):
+
+- No real repo or team names/slugs were ever present anywhere, in the current
+  files or in history.
+- The literal real org slug and company name *were* present in `CONTEXT.md`,
+  `PRD.md`, and issues 01-03 (planning prose only), plus the GitHub repo's
+  description metadata (set at creation, not a tracked file).
+
+Fixed going forward: replaced with a generic placeholder (`acme-digital` org /
+"Acme Digital" company) in all of the above, current `main` is clean. By the
+user's choice, old commits are **not** rewritten, so the real name is still
+visible in early commit history (e.g. blame/`git log -p` on the first few
+commits) — a conscious, low-stakes trade-off given no real repo/team data was
+ever at risk, only the org/company name itself.
+
+**Standing rule for issues 02+**: test fixtures for `gh`/`docker` stubs must
+use synthetic team/repo names (e.g. `acme-digital`-style), never real ones.
+No "full real end-to-end verification" against the actual org/live GitHub
+teams (unlike the Homebrew-pipeline verification on this issue, which only
+touched generic GitHub/Homebrew infrastructure, not proprietary org data).
